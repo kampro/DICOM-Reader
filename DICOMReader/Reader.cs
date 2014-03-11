@@ -12,28 +12,51 @@ namespace DICOMReader
     {
         private gdcm.ImageReader gdcmReader;
         private gdcm.Image image;
+        private gdcm.File file;
         private Bitmap bitmap;
-        private System.Windows.Forms.PictureBox pictureBox;
+        private string patientName;
+        private string bodyPart;
 
-        public Reader(System.Windows.Forms.PictureBox pictureBox)
+        public Bitmap BitmapImage
         {
-            this.gdcmReader = new gdcm.ImageReader();
-            this.pictureBox = pictureBox;
+            get { return this.bitmap; }
         }
 
-        public void Read()
+        public string PatientName
         {
-            this.gdcmReader.SetFileName(@"D:\CT\IM-0001-0001.dcm");
-            //this.gdcmReader.SetFileName(@"D:\Programy\VS\DICOMReader\Grassroots-DICOM\SIEMENS_MOSAIC_12BitsStored-16BitsJPEG.dcm");
+            get { return this.patientName; }
+        }
+
+        public string BodyPart
+        {
+            get { return this.bodyPart; }
+        }
+
+        public Reader()
+        {
+            this.gdcmReader = new gdcm.ImageReader();
+        }
+
+        public bool Read()
+        {
+            //string path = @"D:\Programy\VS\DICOMReader\Grassroots-DICOM\SIEMENS_MOSAIC_12BitsStored-16BitsJPEG.dcm";
+            string path = @"D:\var\CT\IM-0001-0001.dcm";
+            this.gdcmReader.SetFileName(path);
 
             if (this.gdcmReader.Read())
             {
+                this.file = this.gdcmReader.GetFile();
                 this.image = this.gdcmReader.GetImage();
                 this.ReadToBitmap();
+                this.ReadTags();
+
+                return true;
             }
+            else
+                return false;
         }
 
-        private void ReadToBitmap()
+        private bool ReadToBitmap()
         {
             if (this.image != null)
             {
@@ -68,14 +91,14 @@ namespace DICOMReader
 
                         if (i == 0)
                             minLuminance = tempUInt16;
-                        else
-                        {
-                            if (tempUInt16 < minLuminance)
-                                minLuminance = tempUInt16;
-                        }
+                        //else
+                        //{
+                        //    if (tempUInt16 < minLuminance && tempUInt16 != 0)
+                        //        minLuminance = tempUInt16;
+                        //}
                     }
 
-                    double luminanceScale = 255d / maxLuminance;
+                    double luminanceScale = 255d / (maxLuminance - minLuminance);
                     double tempDouble;
                     // DEBUG
                     System.Diagnostics.Debug.WriteLine("min luminance:\t{0}", minLuminance);
@@ -84,10 +107,12 @@ namespace DICOMReader
 
                     for (int i = 0, j = 0; i < bufferConverted.Length; i++, j += 3)
                     {
-                        tempDouble = Math.Floor(bufferConverted[i] * luminanceScale);
+                        tempDouble = Math.Floor((bufferConverted[i] - minLuminance) * luminanceScale);
 
                         if (tempDouble > 255)
                             tempDouble = 255;
+                        else if (tempDouble < 0)
+                            tempDouble = 0;
 
                         buffer[j] = (byte)tempDouble;
                         buffer[j + 1] = buffer[j];
@@ -96,12 +121,55 @@ namespace DICOMReader
 
                     System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
                 }
+                catch
+                {
+                    return false;
+                }
                 finally
                 {
                     this.bitmap.UnlockBits(bitmapData);
                 }
 
-                this.pictureBox.Image = this.bitmap;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        private bool ReadTags()
+        {
+            this.patientName = this.ReadTag(0x10, 0x10);
+            this.bodyPart = this.ReadTag(0x18, 0x15);
+
+            System.Diagnostics.Debug.WriteLine(this.ReadTag(0x28, 0x1050)); // center
+            System.Diagnostics.Debug.WriteLine(this.ReadTag(0x18, 0x1200)); // calibration
+            System.Diagnostics.Debug.WriteLine(this.ReadTag(0x10, 0x30)); // birth
+            System.Diagnostics.Debug.WriteLine(this.ReadTag(0x8, 0x1090));
+
+            return true;
+        }
+
+        private string ReadTag(ushort group, ushort element)
+        {
+            gdcm.Tag tag = new gdcm.Tag(group, element);
+
+            if (group <= 0x08)
+            {
+                gdcm.FileMetaInformation fileMetaInfo = this.file.GetHeader();
+
+                if (fileMetaInfo.FindDataElement(tag))
+                    return fileMetaInfo.GetDataElement(tag).GetValue().toString();
+                else
+                    return string.Empty;
+            }
+            else
+            {
+                gdcm.DataSet dataSet = this.file.GetDataSet();
+
+                if (dataSet.FindDataElement(tag))
+                    return dataSet.GetDataElement(tag).GetValue().toString();
+                else
+                    return string.Empty;
             }
         }
     }

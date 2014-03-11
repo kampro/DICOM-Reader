@@ -18,8 +18,18 @@ namespace DICOMReader
         {
             InitializeComponent();
 
-            this.reader = new Reader(this.pictureBox1);
-            this.reader.Read();
+            this.reader = new Reader();
+
+            if (this.reader.Read())
+            {
+                this.pictureBox1.Image = this.reader.BitmapImage;
+
+                StringBuilder stringBuilder = new StringBuilder("Patient: ");
+                stringBuilder.Append(this.reader.PatientName);
+                stringBuilder.Append(" | Body part: ");
+                stringBuilder.Append(this.reader.BodyPart);
+                this.toolStripStatusLabel1.Text = stringBuilder.ToString();
+            }
         }
     }
 }
