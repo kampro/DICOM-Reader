@@ -1,0 +1,25 @@
+!.gitignore
+
+# User-specific files
+*.suo
+*.user
+
+# NuGet packages (you will have to allow VS to auto add missing NuGet packages)
+packages/
+.nuget/
+
+# Build objects
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Cc]sx/
+
+# Backup
+*.backup.*
+
+# Windows Azure Publish Settings
+.publishsettings
+
+# My libraries
+gdcm/
+Grassroots-DICOM/
