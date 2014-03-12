@@ -11,6 +11,7 @@ namespace DICOMReader
         private gdcm.File file;
         private Bitmap bitmap;
         private FileInformation fileInformation;
+        private string filePath;
 
         public Bitmap BitmapImage
         {
@@ -22,16 +23,23 @@ namespace DICOMReader
             get { return this.fileInformation; }
         }
 
+        public string FilePath
+        {
+            get { return this.filePath; }
+            set { this.filePath = value; }
+        }
+
         public Reader()
         {
-            this.gdcmReader = new gdcm.ImageReader();
+            //this.gdcmReader = new gdcm.ImageReader();
         }
 
         public bool Read()
         {
+            this.gdcmReader = new gdcm.ImageReader();
             //string path = @"D:\Programy\VS\DICOMReader\Grassroots-DICOM\SIEMENS_MOSAIC_12BitsStored-16BitsJPEG.dcm";
-            string path = @"D:\var\CT\IM-0001-0001.dcm";
-            this.gdcmReader.SetFileName(path);
+            //string path = @"D:\var\CT\IM-0001-0001.dcm";
+            this.gdcmReader.SetFileName(this.filePath);
 
             if (this.gdcmReader.Read())
             {
