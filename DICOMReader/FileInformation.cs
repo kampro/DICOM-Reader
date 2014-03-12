@@ -12,6 +12,7 @@ namespace DICOMReader
         public string PatientBirthDate { get; set; }
         public string PatientAge { get; set; }
         public string BodyPart { get; set; }
+        public string ProcedureStep { get; set; }
         public string PatientSex { get; set; }
         public string PatientWeight { get; set; }
         public string PatientSize { get; set; }
@@ -36,6 +37,8 @@ namespace DICOMReader
         public string ImageOrientation { get; set; }
         public string ImagePosition { get; set; }
         public string ImageRotation { get; set; }
+        public string InstitutionName { get; set; }
+        public string InstitutionAddress { get; set; }
         public string DeviceCalibrationDate { get; set; }
         public string DeviceManufacturer { get; set; }
         public string DeviceModel { get; set; }
@@ -54,6 +57,7 @@ namespace DICOMReader
             dictionary.Add("Patient's birth date", this.PatientBirthDate);
             dictionary.Add("Patient's age", this.PatientAge);
             dictionary.Add("Body part", this.BodyPart);
+            dictionary.Add("Procedure step", this.ProcedureStep);
             dictionary.Add("Patient's sex", this.PatientSex);
             dictionary.Add("Patient's weight", this.PatientWeight);
             dictionary.Add("Patient's size", this.PatientSize);
@@ -78,6 +82,8 @@ namespace DICOMReader
             dictionary.Add("Image orientation", this.ImageOrientation);
             dictionary.Add("Image position", this.ImagePosition);
             dictionary.Add("Image rotation", this.ImageRotation);
+            dictionary.Add("Institution name", this.InstitutionName);
+            dictionary.Add("Institution address", this.InstitutionAddress);
             dictionary.Add("Device calibration date", this.DeviceCalibrationDate);
             dictionary.Add("Device manufacturer", this.DeviceManufacturer);
             dictionary.Add("Device model", this.DeviceModel);

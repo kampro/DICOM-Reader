@@ -12,6 +12,7 @@ namespace DICOMReader
         private Reader reader;
         private FileInformation fileInformation;
         private Dictionary<string, string> dictionary;
+        private RAWDataForm rawDataForm;
 
         public Form1()
         {
@@ -29,6 +30,7 @@ namespace DICOMReader
             this.dataGridView1.Columns.Add("tagValue", "Tag value");
 
             this.reader = new Reader();
+            this.rawDataForm = new RAWDataForm();
         }
 
         private void ReadFromReader()
@@ -98,9 +100,9 @@ namespace DICOMReader
                     foreach (object o in filesArray)
                     {
                         filePath = o.ToString();
-                        
+
                         fileInfo = new FileInfo(filePath);
-                        
+
                         node = new TreeNode(fileInfo.Name);
                         node.Tag = filePath;
 
@@ -108,11 +110,20 @@ namespace DICOMReader
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 // DEBUG
                 System.Diagnostics.Debug.WriteLine("DragDrop exception: " + ex.Message);
             }
+        }
+
+        private void showRawDICOMDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //if (this.rawDataForm == null)
+            //    this.rawDataForm = new RAWDataForm();
+
+            this.rawDataForm.Content = this.reader.ListAllTags();
+            this.rawDataForm.ShowDialog();
         }
     }
 }
