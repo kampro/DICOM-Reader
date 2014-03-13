@@ -4,12 +4,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.ComponentModel;
 using Ionic.Zip;
 
 namespace DICOMReader
 {
     public partial class Form1 : Form
     {
+        private const string tempDirPath = @".\TEMP\";
+
         private Reader reader;
         private FileInformation fileInformation;
         private Dictionary<string, string> dictionary;
@@ -19,6 +22,7 @@ namespace DICOMReader
             InitializeComponent();
 
             this.label1.Visible = false;
+            this.tableLayoutPanel1.Visible = false;
             this.pictureBox1.MouseHover += this.Control_MouseHover;
             this.pictureBox1.MouseWheel += this.pictureBox1_MouseWheel;
             this.treeView1.MouseHover += this.Control_MouseHover;
@@ -60,6 +64,8 @@ namespace DICOMReader
                 foreach (KeyValuePair<string, string> kv in this.dictionary)
                     this.dataGridView1.Rows.Add(kv.Key, kv.Value);
             }
+            else
+                MessageBox.Show("File has not been found. File name has been changed, file has been deleted or file is corrupted.", "DICOM Reader error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             this.label1.Visible = false;
         }
@@ -142,20 +148,69 @@ namespace DICOMReader
 
         private void AddZip(FileInfo fileInfo)
         {
-            using (ZipFile zip = ZipFile.Read(fileInfo.FullName))
+            this.tableLayoutPanel1.Visible = true;
+
+            BackgroundWorker backgroundWorker = new BackgroundWorker();
+            backgroundWorker.WorkerReportsProgress = true;
+            backgroundWorker.DoWork += (s, e) =>
             {
-                foreach (ZipEntry ze in zip)
+                using (ZipFile zip = ZipFile.Read(fileInfo.FullName))
                 {
-                    //ze.Extract();
-                    // DEBUG
-                    System.Diagnostics.Debug.WriteLine("file: {0} | un.size: {1} | cp.size: {2} | cp.ratio: {3} | encrypt: {4}",
-                        ze.FileName,
-                        ze.UncompressedSize,
-                        ze.CompressedSize,
-                        ze.CompressionRatio,
-                        (ze.UsesEncryption) ? "Y" : "N");
+                    DirectoryInfo directoryInfo = new DirectoryInfo(Form1.tempDirPath);
+
+                    if (!directoryInfo.Exists)
+                        directoryInfo.Create();
+
+                    string fileExtension;
+                    FileInfo extractedFileInfo;
+
+                    int i = 0;
+                    int total = zip.Count;
+
+                    foreach (ZipEntry ze in zip)
+                    {
+                        fileExtension = ze.FileName.Substring(ze.FileName.Length - 4);
+
+                        if (fileExtension == ".dcm" || fileExtension == ".DCM")
+                        {
+                            ze.Extract(Form1.tempDirPath, ExtractExistingFileAction.OverwriteSilently);
+
+                            extractedFileInfo = new FileInfo(Form1.tempDirPath + ze.FileName.Replace('/', '\\'));
+                            // run in GUI thread
+                            this.treeView1.Invoke(
+                                new EventHandler(
+                                    (s2, e2) =>
+                                    {
+                                        this.AddDCM(extractedFileInfo);
+                                    }
+                                )
+                            );
+                        }
+
+                        i++;
+
+                        backgroundWorker.ReportProgress((int)(i / (double)total * 100));
+
+                        // DEBUG
+                        System.Diagnostics.Debug.WriteLine("file: {0} | un.size: {1} | cp.size: {2} | cp.ratio: {3} | encrypt: {4}",
+                            ze.FileName,
+                            ze.UncompressedSize,
+                            ze.CompressedSize,
+                            ze.CompressionRatio,
+                            (ze.UsesEncryption) ? "Y" : "N");
+                    }
                 }
-            }
+            };
+            backgroundWorker.RunWorkerCompleted += (s, e) =>
+            {
+                this.tableLayoutPanel1.Visible = false;
+                this.progressBar1.Value = 0;
+            };
+            backgroundWorker.ProgressChanged += (s, e) =>
+            {
+                this.progressBar1.Value = e.ProgressPercentage;
+            };
+            backgroundWorker.RunWorkerAsync();
         }
 
         private void showRawDICOMDataToolStripMenuItem_Click(object sender, EventArgs e)
@@ -190,6 +245,24 @@ namespace DICOMReader
             }
             else
                 MessageBox.Show("Image does not exist.", "DICOM Reader information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            DirectoryInfo directoryInfo = new DirectoryInfo(Form1.tempDirPath);
+
+            if (directoryInfo.Exists)
+            {
+                try
+                {
+                    directoryInfo.Delete(true);
+                }
+                catch (Exception ex)
+                {
+                    // DEBUG
+                    System.Diagnostics.Debug.WriteLine("Directory delete exception: " + ex.Message);
+                }
+            }
         }
     }
 }
