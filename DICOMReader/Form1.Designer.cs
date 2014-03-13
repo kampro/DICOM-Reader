@@ -43,6 +43,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openDirectoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openZIPArchiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -86,6 +89,9 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openFileToolStripMenuItem,
+            this.openDirectoryToolStripMenuItem,
+            this.openZIPArchiveToolStripMenuItem,
             this.showRawDICOMDataToolStripMenuItem,
             this.exportToBMPToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -226,6 +232,26 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(200, 180);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
+            // openFileToolStripMenuItem
+            // 
+            this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.openFileToolStripMenuItem.Text = "Open DICOM files";
+            this.openFileToolStripMenuItem.Click += new System.EventHandler(this.openFileToolStripMenuItem_Click);
+            // 
+            // openDirectoryToolStripMenuItem
+            // 
+            this.openDirectoryToolStripMenuItem.Name = "openDirectoryToolStripMenuItem";
+            this.openDirectoryToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.openDirectoryToolStripMenuItem.Text = "Open directory";
+            // 
+            // openZIPArchiveToolStripMenuItem
+            // 
+            this.openZIPArchiveToolStripMenuItem.Name = "openZIPArchiveToolStripMenuItem";
+            this.openZIPArchiveToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.openZIPArchiveToolStripMenuItem.Text = "Open ZIP archive";
+            this.openZIPArchiveToolStripMenuItem.Click += new System.EventHandler(this.openZIPArchiveToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -277,6 +303,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ToolStripMenuItem openFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openDirectoryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openZIPArchiveToolStripMenuItem;
 
     }
 }

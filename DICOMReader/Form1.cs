@@ -213,6 +213,40 @@ namespace DICOMReader
             backgroundWorker.RunWorkerAsync();
         }
 
+        private void openFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = "DICOM file (*.dcm)|*.dcm;*.DCM";
+            fileDialog.Multiselect = true;
+            fileDialog.FilterIndex = 1;
+
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                FileInfo fileInfo;
+
+                foreach (string path in fileDialog.FileNames)
+                {
+                    fileInfo = new FileInfo(path);
+                    this.AddDCM(fileInfo);
+                }
+            }
+        }
+
+        private void openZIPArchiveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = "ZIP archive (*.zip)|*.zip;*.ZIP";
+            fileDialog.Multiselect = false;
+            fileDialog.FilterIndex = 1;
+
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                FileInfo fileInfo = new FileInfo(fileDialog.FileName);
+
+                this.AddZip(fileInfo);
+            }
+        }
+
         private void showRawDICOMDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
             RAWDataForm rawDataForm = new RAWDataForm();
