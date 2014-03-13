@@ -10,6 +10,8 @@ namespace DICOMReader
         private gdcm.ImageReader gdcmReader;
         private gdcm.Image image;
         private gdcm.File file;
+        private int dimX;
+        private int dimY;
         private Bitmap bitmap;
         private FileInformation fileInformation;
         private string filePath;
@@ -28,6 +30,11 @@ namespace DICOMReader
         {
             get { return this.filePath; }
             set { this.filePath = value; }
+        }
+
+        public int[] Dims
+        {
+            get { return new int[] { this.dimX, this.dimY }; }
         }
 
         public Reader()
@@ -104,14 +111,14 @@ namespace DICOMReader
         {
             if (this.image != null)
             {
-                int dimX = (int)this.image.GetDimension(0);
-                int dimY = (int)this.image.GetDimension(1);
+                this.dimX = (int)this.image.GetDimension(0);
+                this.dimY = (int)this.image.GetDimension(1);
                 // DEBUG
-                System.Diagnostics.Debug.WriteLine("dimensions:\t{0}x{1}", dimX, dimY);
+                System.Diagnostics.Debug.WriteLine("dimensions:\t{0}x{1}", this.dimX, this.dimY);
                 System.Diagnostics.Debug.WriteLine("pixel format:\t" + this.image.GetPixelFormat().GetScalarType().ToString());
 
-                this.bitmap = new Bitmap(dimX, dimY);
-                BitmapData bitmapData = this.bitmap.LockBits(new Rectangle(0, 0, dimX, dimY), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+                this.bitmap = new Bitmap(this.dimX, this.dimY);
+                BitmapData bitmapData = this.bitmap.LockBits(new Rectangle(0, 0, this.dimX, this.dimY), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
 
                 try
                 {

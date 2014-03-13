@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using Ionic.Zip;
 
 namespace DICOMReader
 {
@@ -12,7 +13,6 @@ namespace DICOMReader
         private Reader reader;
         private FileInformation fileInformation;
         private Dictionary<string, string> dictionary;
-        private RAWDataForm rawDataForm;
 
         public Form1()
         {
@@ -46,10 +46,13 @@ namespace DICOMReader
                 this.fileInformation = this.reader.FileInf;
                 this.dictionary = this.fileInformation.GetTagsDictionary();
 
+                int[] dims = this.reader.Dims;
+
                 StringBuilder stringBuilder = new StringBuilder("Patient: ");
                 stringBuilder.Append(this.fileInformation.PatientName);
                 stringBuilder.Append(" | Body part: ");
                 stringBuilder.Append(this.fileInformation.BodyPart);
+                stringBuilder.AppendFormat(" | Image dimensions: {0}x{1}", dims[0], dims[1]);
                 this.toolStripStatusLabel1.Text = stringBuilder.ToString();
 
                 this.dataGridView1.Rows.Clear();
@@ -100,21 +103,8 @@ namespace DICOMReader
 
                 if (filesArray != null)
                 {
-                    string filePath;
-                    FileInfo fileInfo;
-
                     foreach (object o in filesArray)
-                    {
-                        filePath = o.ToString();
-
-                        fileInfo = new FileInfo(filePath);
-
-                        if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
-                        {
-                        }
-                        else if (fileInfo.Extension == ".dcm" || fileInfo.Extension == ".DCM")
-                            this.AddFile(filePath);
-                    }
+                        this.AddFile(o.ToString());
                 }
             }
             catch (Exception ex)
@@ -124,27 +114,82 @@ namespace DICOMReader
             }
         }
 
-        private void AddDir(string path)
-        {
-        }
-
         private void AddFile(string path)
         {
             FileInfo fileInfo = new FileInfo(path);
+
+            if (/*((fileInfo.Attributes & FileAttributes.Normal) == FileAttributes.Normal) &&*/
+                (fileInfo.Extension == ".dcm" || fileInfo.Extension == ".DCM"))
+                this.AddDCM(fileInfo);
+            else if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+            { MessageBox.Show("DIR"); }
+            else if (((fileInfo.Attributes & FileAttributes.Archive) == FileAttributes.Archive) &&
+                (fileInfo.Extension == ".zip" || fileInfo.Extension == ".ZIP"))
+                this.AddZip(fileInfo);
+        }
+
+        private void AddDir(FileInfo fileInfo)
+        {
+        }
+
+        private void AddDCM(FileInfo fileInfo)
+        {
             TreeNode node = new TreeNode(fileInfo.Name);
 
-            node.Tag = path;
+            node.Tag = fileInfo.FullName;
             this.treeView1.Nodes.Add(node);
+        }
+
+        private void AddZip(FileInfo fileInfo)
+        {
+            using (ZipFile zip = ZipFile.Read(fileInfo.FullName))
+            {
+                foreach (ZipEntry ze in zip)
+                {
+                    //ze.Extract();
+                    // DEBUG
+                    System.Diagnostics.Debug.WriteLine("file: {0} | un.size: {1} | cp.size: {2} | cp.ratio: {3} | encrypt: {4}",
+                        ze.FileName,
+                        ze.UncompressedSize,
+                        ze.CompressedSize,
+                        ze.CompressionRatio,
+                        (ze.UsesEncryption) ? "Y" : "N");
+                }
+            }
         }
 
         private void showRawDICOMDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.rawDataForm == null)
-                this.rawDataForm = new RAWDataForm();
+            RAWDataForm rawDataForm = new RAWDataForm();
 
-            this.rawDataForm.Focus();
-            this.rawDataForm.Content = this.reader.ListAllTags();
-            this.rawDataForm.ShowDialog();
+            rawDataForm.Focus();
+            rawDataForm.Content = this.reader.ListAllTags();
+            rawDataForm.ShowDialog();
+        }
+
+        private void exportToBMPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBox1.Image != null)
+            {
+                SaveFileDialog fileDialog = new SaveFileDialog();
+                fileDialog.AddExtension = true;
+                fileDialog.Filter = "Portable Network Graphics (*.png)|*.png|Bitmap (*.bmp)|*.bmp";
+                fileDialog.FilterIndex = 1;
+
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    System.Drawing.Imaging.ImageFormat format;
+
+                    if (fileDialog.FilterIndex == 1)
+                        format = System.Drawing.Imaging.ImageFormat.Png;
+                    else
+                        format = System.Drawing.Imaging.ImageFormat.Bmp;
+
+                    this.pictureBox1.Image.Save(fileDialog.FileName, format);
+                }
+            }
+            else
+                MessageBox.Show("Image does not exist.", "DICOM Reader information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

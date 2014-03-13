@@ -17,8 +17,6 @@ namespace DICOMReader
         public RAWDataForm()
         {
             this.textBox = new TextBox();
-            //this.label.AutoSize = true;
-            //this.label.Padding = new Padding(20);
             this.textBox.BackColor = System.Drawing.Color.White;
             this.textBox.Multiline = true;
             this.textBox.Dock = DockStyle.Fill;
