@@ -32,20 +32,23 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openDicomsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openDirectoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openZIPArchiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showRawDICOMDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToBMPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nodesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.label2 = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openDirectoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openZIPArchiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -56,9 +59,9 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -79,7 +82,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.nodesToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(784, 24);
@@ -89,7 +93,7 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openFileToolStripMenuItem,
+            this.openDicomsToolStripMenuItem,
             this.openDirectoryToolStripMenuItem,
             this.openZIPArchiveToolStripMenuItem,
             this.showRawDICOMDataToolStripMenuItem,
@@ -97,6 +101,26 @@
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
+            // 
+            // openDicomsToolStripMenuItem
+            // 
+            this.openDicomsToolStripMenuItem.Name = "openDicomsToolStripMenuItem";
+            this.openDicomsToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.openDicomsToolStripMenuItem.Text = "Open DICOMs";
+            this.openDicomsToolStripMenuItem.Click += new System.EventHandler(this.openDICOMsToolStripMenuItem_Click);
+            // 
+            // openDirectoryToolStripMenuItem
+            // 
+            this.openDirectoryToolStripMenuItem.Name = "openDirectoryToolStripMenuItem";
+            this.openDirectoryToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.openDirectoryToolStripMenuItem.Text = "Open directory";
+            // 
+            // openZIPArchiveToolStripMenuItem
+            // 
+            this.openZIPArchiveToolStripMenuItem.Name = "openZIPArchiveToolStripMenuItem";
+            this.openZIPArchiveToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.openZIPArchiveToolStripMenuItem.Text = "Open ZIP archive";
+            this.openZIPArchiveToolStripMenuItem.Click += new System.EventHandler(this.openZIPArchiveToolStripMenuItem_Click);
             // 
             // showRawDICOMDataToolStripMenuItem
             // 
@@ -110,7 +134,29 @@
             this.exportToBMPToolStripMenuItem.Name = "exportToBMPToolStripMenuItem";
             this.exportToBMPToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.exportToBMPToolStripMenuItem.Text = "Export image";
-            this.exportToBMPToolStripMenuItem.Click += new System.EventHandler(this.exportToBMPToolStripMenuItem_Click);
+            this.exportToBMPToolStripMenuItem.Click += new System.EventHandler(this.exportImageToolStripMenuItem_Click);
+            // 
+            // nodesToolStripMenuItem
+            // 
+            this.nodesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buildToolStripMenuItem,
+            this.removeSelectedToolStripMenuItem});
+            this.nodesToolStripMenuItem.Name = "nodesToolStripMenuItem";
+            this.nodesToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
+            this.nodesToolStripMenuItem.Text = "Nodes";
+            // 
+            // buildToolStripMenuItem
+            // 
+            this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
+            this.buildToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.buildToolStripMenuItem.Text = "Build hierarchy";
+            // 
+            // removeSelectedToolStripMenuItem
+            // 
+            this.removeSelectedToolStripMenuItem.Name = "removeSelectedToolStripMenuItem";
+            this.removeSelectedToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.removeSelectedToolStripMenuItem.Text = "Remove selected";
+            this.removeSelectedToolStripMenuItem.Click += new System.EventHandler(this.removeSelectedToolStripMenuItem_Click);
             // 
             // splitContainer1
             // 
@@ -149,6 +195,44 @@
             this.splitContainer2.SplitterDistance = 180;
             this.splitContainer2.TabIndex = 0;
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(200, 180);
+            this.tableLayoutPanel1.TabIndex = 1;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar1.Location = new System.Drawing.Point(7, 27);
+            this.progressBar1.Margin = new System.Windows.Forms.Padding(7);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(186, 23);
+            this.progressBar1.TabIndex = 2;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.SystemColors.Control;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label2.ForeColor = System.Drawing.Color.Black;
+            this.label2.Location = new System.Drawing.Point(3, 0);
+            this.label2.Name = "label2";
+            this.label2.Padding = new System.Windows.Forms.Padding(2);
+            this.label2.Size = new System.Drawing.Size(122, 20);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Extracting ZIP file...";
+            // 
             // treeView1
             // 
             this.treeView1.AllowDrop = true;
@@ -157,6 +241,7 @@
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(200, 180);
             this.treeView1.TabIndex = 0;
+            this.treeView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView1_KeyDown);
             // 
             // dataGridView1
             // 
@@ -194,64 +279,6 @@
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.SystemColors.Control;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label2.ForeColor = System.Drawing.Color.Black;
-            this.label2.Location = new System.Drawing.Point(3, 0);
-            this.label2.Name = "label2";
-            this.label2.Padding = new System.Windows.Forms.Padding(2);
-            this.label2.Size = new System.Drawing.Size(122, 20);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Extracting ZIP file...";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(7, 27);
-            this.progressBar1.Margin = new System.Windows.Forms.Padding(7);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(186, 23);
-            this.progressBar1.TabIndex = 2;
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(200, 180);
-            this.tableLayoutPanel1.TabIndex = 1;
-            // 
-            // openFileToolStripMenuItem
-            // 
-            this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.openFileToolStripMenuItem.Text = "Open DICOM files";
-            this.openFileToolStripMenuItem.Click += new System.EventHandler(this.openFileToolStripMenuItem_Click);
-            // 
-            // openDirectoryToolStripMenuItem
-            // 
-            this.openDirectoryToolStripMenuItem.Name = "openDirectoryToolStripMenuItem";
-            this.openDirectoryToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.openDirectoryToolStripMenuItem.Text = "Open directory";
-            // 
-            // openZIPArchiveToolStripMenuItem
-            // 
-            this.openZIPArchiveToolStripMenuItem.Name = "openZIPArchiveToolStripMenuItem";
-            this.openZIPArchiveToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.openZIPArchiveToolStripMenuItem.Text = "Open ZIP archive";
-            this.openZIPArchiveToolStripMenuItem.Click += new System.EventHandler(this.openZIPArchiveToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -277,10 +304,10 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -303,9 +330,12 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.ToolStripMenuItem openFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openDicomsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openDirectoryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openZIPArchiveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nodesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeSelectedToolStripMenuItem;
 
     }
 }

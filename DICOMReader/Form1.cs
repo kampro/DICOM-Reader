@@ -26,7 +26,6 @@ namespace DICOMReader
             this.pictureBox1.MouseHover += this.Control_MouseHover;
             this.pictureBox1.MouseWheel += this.pictureBox1_MouseWheel;
             this.treeView1.MouseHover += this.Control_MouseHover;
-            this.treeView1.MouseWheel += this.pictureBox1_MouseWheel;
             this.treeView1.DragEnter += this.treeView1_DragEnter;
             this.treeView1.DragDrop += this.treeView1_DragDrop;
             this.treeView1.AfterSelect += this.treeView1_AfterSelect;
@@ -77,13 +76,17 @@ namespace DICOMReader
 
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
+            TreeNode selectedNode = this.treeView1.SelectedNode;
+
             if (e.Delta > 0)
             {
-                // mouse up
+                if (selectedNode != null)
+                    this.treeView1.SelectedNode = selectedNode.PrevVisibleNode;
             }
             else if (e.Delta < 0)
             {
-                // mouse down
+                if (selectedNode != null)
+                    this.treeView1.SelectedNode = selectedNode.NextVisibleNode;
             }
         }
 
@@ -213,7 +216,7 @@ namespace DICOMReader
             backgroundWorker.RunWorkerAsync();
         }
 
-        private void openFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openDICOMsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "DICOM file (*.dcm)|*.dcm;*.DCM";
@@ -256,7 +259,7 @@ namespace DICOMReader
             rawDataForm.ShowDialog();
         }
 
-        private void exportToBMPToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exportImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.pictureBox1.Image != null)
             {
@@ -297,6 +300,20 @@ namespace DICOMReader
                     System.Diagnostics.Debug.WriteLine("Directory delete exception: " + ex.Message);
                 }
             }
+        }
+
+        private void removeSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode selectedNode = this.treeView1.SelectedNode;
+
+            if (selectedNode != null)
+                this.treeView1.Nodes.Remove(selectedNode);
+        }
+
+        private void treeView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+                this.removeSelectedToolStripMenuItem_Click(sender, e);
         }
     }
 }
