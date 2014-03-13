@@ -18,6 +18,7 @@ namespace DICOMReader
         {
             InitializeComponent();
 
+            this.label1.Visible = false;
             this.pictureBox1.MouseHover += this.Control_MouseHover;
             this.pictureBox1.MouseWheel += this.pictureBox1_MouseWheel;
             this.treeView1.MouseHover += this.Control_MouseHover;
@@ -28,13 +29,17 @@ namespace DICOMReader
             this.dataGridView1.MouseHover += this.Control_MouseHover;
             this.dataGridView1.Columns.Add("tagName", "Tag name");
             this.dataGridView1.Columns.Add("tagValue", "Tag value");
+            this.dataGridView1.Columns["tagName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            this.dataGridView1.Columns["tagValue"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            this.dataGridView1.RowHeadersWidth = 14;
 
             this.reader = new Reader();
-            this.rawDataForm = new RAWDataForm();
         }
 
         private void ReadFromReader()
         {
+            this.label1.Visible = true;
+
             if (this.reader.FilePath != null && this.reader.Read())
             {
                 this.pictureBox1.Image = this.reader.BitmapImage;
@@ -52,6 +57,8 @@ namespace DICOMReader
                 foreach (KeyValuePair<string, string> kv in this.dictionary)
                     this.dataGridView1.Rows.Add(kv.Key, kv.Value);
             }
+
+            this.label1.Visible = false;
         }
 
         private void Control_MouseHover(object sender, EventArgs e)
@@ -94,7 +101,6 @@ namespace DICOMReader
                 if (filesArray != null)
                 {
                     string filePath;
-                    TreeNode node;
                     FileInfo fileInfo;
 
                     foreach (object o in filesArray)
@@ -103,10 +109,11 @@ namespace DICOMReader
 
                         fileInfo = new FileInfo(filePath);
 
-                        node = new TreeNode(fileInfo.Name);
-                        node.Tag = filePath;
-
-                        this.treeView1.Nodes.Add(node);
+                        if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                        }
+                        else if (fileInfo.Extension == ".dcm" || fileInfo.Extension == ".DCM")
+                            this.AddFile(filePath);
                     }
                 }
             }
@@ -117,11 +124,25 @@ namespace DICOMReader
             }
         }
 
+        private void AddDir(string path)
+        {
+        }
+
+        private void AddFile(string path)
+        {
+            FileInfo fileInfo = new FileInfo(path);
+            TreeNode node = new TreeNode(fileInfo.Name);
+
+            node.Tag = path;
+            this.treeView1.Nodes.Add(node);
+        }
+
         private void showRawDICOMDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //if (this.rawDataForm == null)
-            //    this.rawDataForm = new RAWDataForm();
+            if (this.rawDataForm == null)
+                this.rawDataForm = new RAWDataForm();
 
+            this.rawDataForm.Focus();
             this.rawDataForm.Content = this.reader.ListAllTags();
             this.rawDataForm.ShowDialog();
         }

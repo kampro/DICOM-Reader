@@ -39,6 +39,7 @@ namespace DICOMReader
         public string ImageRotation { get; set; }
         public string InstitutionName { get; set; }
         public string InstitutionAddress { get; set; }
+        public string PhysicianName { get; set; }
         public string DeviceCalibrationDate { get; set; }
         public string DeviceManufacturer { get; set; }
         public string DeviceModel { get; set; }
@@ -84,6 +85,7 @@ namespace DICOMReader
             dictionary.Add("Image rotation", this.ImageRotation);
             dictionary.Add("Institution name", this.InstitutionName);
             dictionary.Add("Institution address", this.InstitutionAddress);
+            dictionary.Add("Physician's name", this.PhysicianName);
             dictionary.Add("Device calibration date", this.DeviceCalibrationDate);
             dictionary.Add("Device manufacturer", this.DeviceManufacturer);
             dictionary.Add("Device model", this.DeviceModel);

@@ -220,6 +220,7 @@ namespace DICOMReader
                 this.fileInformation.ImageRotation = this.ReadTag(0x70, 0x42);
                 this.fileInformation.InstitutionName = this.ReadTag(0x8, 0x80);
                 this.fileInformation.InstitutionAddress = this.ReadTag(0x8, 0x81);
+                this.fileInformation.PhysicianName = this.ReadTag(0x8, 0x90);
                 this.fileInformation.DeviceCalibrationDate = this.ReadTag(0x18, 0x1200);
                 this.fileInformation.DeviceManufacturer = this.ReadTag(0x8, 0x70);
                 this.fileInformation.DeviceModel = this.ReadTag(0x8, 0x1090);
