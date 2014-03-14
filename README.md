@@ -1,4 +1,4 @@
-﻿DICOM-Reader
+﻿DICOM Reader
 ============
 
 Application for viewing DICOM files (supports ZIP archives).
@@ -12,3 +12,8 @@ Requirements
 + Download *DotNetZip* library
 
 Tested on *.NET* 4.5
+
+Screenshot
+---
+
+![DICOM Reader screenshot](https://raw.github.com/kampro/DICOM-Reader/master/screenshot.png)
