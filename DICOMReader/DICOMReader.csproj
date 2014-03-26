@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileHelper.cs" />
     <Compile Include="FileInformation.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

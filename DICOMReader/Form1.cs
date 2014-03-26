@@ -11,11 +11,12 @@ namespace DICOMReader
 {
     public partial class Form1 : Form
     {
-        private const string tempDirPath = @".\TEMP\";
+        //private const string tempDirPath = @".\TEMP\";
 
         private Reader reader;
         private FileInformation fileInformation;
         private Dictionary<string, string> dictionary;
+        private FileHelper fileHelper;
 
         public Form1()
         {
@@ -35,6 +36,17 @@ namespace DICOMReader
             this.dataGridView1.Columns["tagName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             this.dataGridView1.Columns["tagValue"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             this.dataGridView1.RowHeadersWidth = 14;
+
+            this.fileHelper = new FileHelper(this.treeView1);
+            this.fileHelper.zipComplete = (s, e) =>
+            {
+                this.tableLayoutPanel1.Visible = false;
+                this.progressBar1.Value = 0;
+            };
+            this.fileHelper.zipProgressChanged = (s, e) =>
+            {
+                this.progressBar1.Value = e.ProgressPercentage;
+            };
 
             this.reader = new Reader();
         }
@@ -127,94 +139,91 @@ namespace DICOMReader
         {
             FileInfo fileInfo = new FileInfo(path);
 
-            if (/*((fileInfo.Attributes & FileAttributes.Normal) == FileAttributes.Normal) &&*/
-                (fileInfo.Extension == ".dcm" || fileInfo.Extension == ".DCM"))
-                this.AddDCM(fileInfo);
+            if (this.fileHelper.IsDCM(fileInfo))
+                this.fileHelper.AddDCM(fileInfo);
             else if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
             { MessageBox.Show("DIR"); }
-            else if (((fileInfo.Attributes & FileAttributes.Archive) == FileAttributes.Archive) &&
-                (fileInfo.Extension == ".zip" || fileInfo.Extension == ".ZIP"))
-                this.AddZip(fileInfo);
-        }
-
-        private void AddDir(FileInfo fileInfo)
-        {
-        }
-
-        private void AddDCM(FileInfo fileInfo)
-        {
-            TreeNode node = new TreeNode(fileInfo.Name);
-
-            node.Tag = fileInfo.FullName;
-            this.treeView1.Nodes.Add(node);
-        }
-
-        private void AddZip(FileInfo fileInfo)
-        {
-            this.tableLayoutPanel1.Visible = true;
-
-            BackgroundWorker backgroundWorker = new BackgroundWorker();
-            backgroundWorker.WorkerReportsProgress = true;
-            backgroundWorker.DoWork += (s, e) =>
+            else if (this.fileHelper.IsZip(fileInfo))
             {
-                using (ZipFile zip = ZipFile.Read(fileInfo.FullName))
-                {
-                    DirectoryInfo directoryInfo = new DirectoryInfo(Form1.tempDirPath);
-
-                    if (!directoryInfo.Exists)
-                        directoryInfo.Create();
-
-                    string fileExtension;
-                    FileInfo extractedFileInfo;
-
-                    int i = 0;
-                    int total = zip.Count;
-
-                    foreach (ZipEntry ze in zip)
-                    {
-                        fileExtension = ze.FileName.Substring(ze.FileName.Length - 4);
-
-                        if (fileExtension == ".dcm" || fileExtension == ".DCM")
-                        {
-                            ze.Extract(Form1.tempDirPath, ExtractExistingFileAction.OverwriteSilently);
-
-                            extractedFileInfo = new FileInfo(Form1.tempDirPath + ze.FileName.Replace('/', '\\'));
-                            // run in GUI thread
-                            this.treeView1.Invoke(
-                                new EventHandler(
-                                    (s2, e2) =>
-                                    {
-                                        this.AddDCM(extractedFileInfo);
-                                    }
-                                )
-                            );
-                        }
-
-                        i++;
-
-                        backgroundWorker.ReportProgress((int)(i / (double)total * 100));
-
-                        // DEBUG
-                        System.Diagnostics.Debug.WriteLine("file: {0} | un.size: {1} | cp.size: {2} | cp.ratio: {3} | encrypt: {4}",
-                            ze.FileName,
-                            ze.UncompressedSize,
-                            ze.CompressedSize,
-                            ze.CompressionRatio,
-                            (ze.UsesEncryption) ? "Y" : "N");
-                    }
-                }
-            };
-            backgroundWorker.RunWorkerCompleted += (s, e) =>
-            {
-                this.tableLayoutPanel1.Visible = false;
-                this.progressBar1.Value = 0;
-            };
-            backgroundWorker.ProgressChanged += (s, e) =>
-            {
-                this.progressBar1.Value = e.ProgressPercentage;
-            };
-            backgroundWorker.RunWorkerAsync();
+                this.tableLayoutPanel1.Visible = true;
+                this.fileHelper.AddZip(fileInfo);
+            }
         }
+
+        //private void AddDCM(FileInfo fileInfo)
+        //{
+        //    TreeNode node = new TreeNode(fileInfo.Name);
+
+        //    node.Tag = fileInfo.FullName;
+        //    this.treeView1.Nodes.Add(node);
+        //}
+
+        //private void AddZip(FileInfo fileInfo)
+        //{
+        //    this.tableLayoutPanel1.Visible = true;
+
+        //    BackgroundWorker backgroundWorker = new BackgroundWorker();
+        //    backgroundWorker.WorkerReportsProgress = true;
+        //    backgroundWorker.DoWork += (s, e) =>
+        //    {
+        //        using (ZipFile zip = ZipFile.Read(fileInfo.FullName))
+        //        {
+        //            DirectoryInfo directoryInfo = new DirectoryInfo(Form1.tempDirPath);
+
+        //            if (!directoryInfo.Exists)
+        //                directoryInfo.Create();
+
+        //            string fileExtension;
+        //            FileInfo extractedFileInfo;
+
+        //            int i = 0;
+        //            int total = zip.Count;
+
+        //            foreach (ZipEntry ze in zip)
+        //            {
+        //                fileExtension = ze.FileName.Substring(ze.FileName.Length - 4);
+
+        //                if (fileExtension == ".dcm" || fileExtension == ".DCM")
+        //                {
+        //                    ze.Extract(Form1.tempDirPath, ExtractExistingFileAction.OverwriteSilently);
+
+        //                    extractedFileInfo = new FileInfo(Form1.tempDirPath + ze.FileName.Replace('/', '\\'));
+        //                    // run in GUI thread
+        //                    this.treeView1.Invoke(
+        //                        new EventHandler(
+        //                            (s2, e2) =>
+        //                            {
+        //                                this.AddDCM(extractedFileInfo);
+        //                            }
+        //                        )
+        //                    );
+        //                }
+
+        //                i++;
+
+        //                backgroundWorker.ReportProgress((int)(i / (double)total * 100));
+
+        //                // DEBUG
+        //                System.Diagnostics.Debug.WriteLine("file: {0} | un.size: {1} | cp.size: {2} | cp.ratio: {3} | encrypt: {4}",
+        //                    ze.FileName,
+        //                    ze.UncompressedSize,
+        //                    ze.CompressedSize,
+        //                    ze.CompressionRatio,
+        //                    (ze.UsesEncryption) ? "Y" : "N");
+        //            }
+        //        }
+        //    };
+        //    backgroundWorker.RunWorkerCompleted += (s, e) =>
+        //    {
+        //        this.tableLayoutPanel1.Visible = false;
+        //        this.progressBar1.Value = 0;
+        //    };
+        //    backgroundWorker.ProgressChanged += (s, e) =>
+        //    {
+        //        this.progressBar1.Value = e.ProgressPercentage;
+        //    };
+        //    backgroundWorker.RunWorkerAsync();
+        //}
 
         private void openDICOMsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -230,7 +239,7 @@ namespace DICOMReader
                 foreach (string path in fileDialog.FileNames)
                 {
                     fileInfo = new FileInfo(path);
-                    this.AddDCM(fileInfo);
+                    this.fileHelper.AddDCM(fileInfo);
                 }
             }
         }
@@ -244,9 +253,10 @@ namespace DICOMReader
 
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
+                this.tableLayoutPanel1.Visible = true;
                 FileInfo fileInfo = new FileInfo(fileDialog.FileName);
 
-                this.AddZip(fileInfo);
+                this.fileHelper.AddZip(fileInfo);
             }
         }
 
@@ -286,7 +296,7 @@ namespace DICOMReader
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo(Form1.tempDirPath);
+            DirectoryInfo directoryInfo = new DirectoryInfo(FileHelper.tempDirPath);
 
             if (directoryInfo.Exists)
             {
