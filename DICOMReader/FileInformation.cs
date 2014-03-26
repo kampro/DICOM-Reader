@@ -7,6 +7,7 @@ namespace DICOMReader
     {
         public string StudyID { get; set; }
         public string StudyInstanceUID { get; set; }
+        public string SeriesInstanceUID { get; set; }
         public string PatientID { get; set; }
         public string PatientName { get; set; }
         public string PatientBirthDate { get; set; }
@@ -53,6 +54,7 @@ namespace DICOMReader
 
             dictionary.Add("Study ID", this.StudyID);
             dictionary.Add("Study instance UID", this.StudyInstanceUID);
+            dictionary.Add("Series instance UID", this.SeriesInstanceUID);
             dictionary.Add("Patient ID", this.PatientID);
             dictionary.Add("Patient's name", this.PatientName);
             dictionary.Add("Patient's birth date", this.PatientBirthDate);

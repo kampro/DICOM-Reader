@@ -11,12 +11,12 @@ namespace DICOMReader
 {
     public partial class Form1 : Form
     {
-        //private const string tempDirPath = @".\TEMP\";
-
         private Reader reader;
         private FileInformation fileInformation;
         private Dictionary<string, string> dictionary;
         private FileHelper fileHelper;
+        private RunWorkerCompletedEventHandler workerCompleted;
+        private ProgressChangedEventHandler progressChanged;
 
         public Form1()
         {
@@ -37,16 +37,19 @@ namespace DICOMReader
             this.dataGridView1.Columns["tagValue"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             this.dataGridView1.RowHeadersWidth = 14;
 
-            this.fileHelper = new FileHelper(this.treeView1);
-            this.fileHelper.zipComplete = (s, e) =>
+            this.workerCompleted = (s, e) =>
             {
                 this.tableLayoutPanel1.Visible = false;
                 this.progressBar1.Value = 0;
             };
-            this.fileHelper.zipProgressChanged = (s, e) =>
+            this.progressChanged = (s, e) =>
             {
                 this.progressBar1.Value = e.ProgressPercentage;
             };
+
+            this.fileHelper = new FileHelper(this.treeView1);
+            this.fileHelper.zipCompleted = this.workerCompleted;
+            this.fileHelper.zipProgressChanged = this.progressChanged;
 
             this.reader = new Reader();
         }
@@ -81,6 +84,89 @@ namespace DICOMReader
             this.label1.Visible = false;
         }
 
+        private void BuildTree()
+        {
+            this.label2.Text = "Building images' hierarchy...";
+
+            BackgroundWorker backgroundWorker = new BackgroundWorker();
+            backgroundWorker.WorkerReportsProgress = true;
+            backgroundWorker.DoWork += (s, e) =>
+            {
+                string[] ids;
+                List<FileInfo> entries = new List<FileInfo>();
+                TreeNode treeNode;
+
+                foreach (TreeNode n in this.treeView1.Nodes)
+                    entries.Add(new FileInfo(n.Tag.ToString()));
+
+                double total = entries.Count;
+
+                this.treeView1.Invoke(
+                    new EventHandler(
+                        (s2, e2) =>
+                        {
+                            this.treeView1.Nodes.Clear();
+                        }
+                    )
+                );
+
+                int i = 0;
+
+                foreach (FileInfo fi in entries)
+                {
+                    this.reader.FilePath = fi.FullName;
+
+                    if (this.reader.FilePath != null)
+                    {
+                        ids = this.reader.GetIDs();
+
+                        if (!this.treeView1.Nodes.ContainsKey(ids[0]))
+                        {
+                            this.treeView1.Invoke(
+                                new EventHandler(
+                                    (s2, e2) =>
+                                    {
+                                        this.treeView1.Nodes.Add(ids[0], ids[0]);
+                                    }
+                                )
+                            );
+                        }
+
+                        if (!this.treeView1.Nodes[ids[0]].Nodes.ContainsKey(ids[1]))
+                        {
+                            this.treeView1.Invoke(
+                                new EventHandler(
+                                    (s2, e2) =>
+                                    {
+                                        this.treeView1.Nodes[ids[0]].Nodes.Add(ids[1], ids[1]);
+                                    }
+                                )
+                            );
+                        }
+
+                        treeNode = new TreeNode(fi.Name);
+                        treeNode.Tag = fi.FullName;
+
+                        this.treeView1.Invoke(
+                            new EventHandler(
+                                (s2, e2) =>
+                                {
+                                    this.treeView1.Nodes[ids[0]].Nodes[ids[1]].Nodes.Add(treeNode);
+                                }
+                            )
+                        );
+
+                        i++;
+
+                        backgroundWorker.ReportProgress((int)(i / total * 100));
+                    }
+                }
+            };
+            backgroundWorker.RunWorkerCompleted += this.workerCompleted;
+            backgroundWorker.ProgressChanged += this.progressChanged;
+            backgroundWorker.RunWorkerAsync();
+        }
+
         private void Control_MouseHover(object sender, EventArgs e)
         {
             ((Control)sender).Focus();
@@ -104,8 +190,11 @@ namespace DICOMReader
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            this.reader.FilePath = e.Node.Tag.ToString();
-            this.ReadFromReader();
+            if (e.Node.Tag != null)
+            {
+                this.reader.FilePath = e.Node.Tag.ToString();
+                this.ReadFromReader();
+            }
         }
 
         private void treeView1_DragEnter(object sender, DragEventArgs e)
@@ -145,85 +234,11 @@ namespace DICOMReader
             { MessageBox.Show("DIR"); }
             else if (this.fileHelper.IsZip(fileInfo))
             {
+                this.label2.Text = "Extracting ZIP file...";
                 this.tableLayoutPanel1.Visible = true;
                 this.fileHelper.AddZip(fileInfo);
             }
         }
-
-        //private void AddDCM(FileInfo fileInfo)
-        //{
-        //    TreeNode node = new TreeNode(fileInfo.Name);
-
-        //    node.Tag = fileInfo.FullName;
-        //    this.treeView1.Nodes.Add(node);
-        //}
-
-        //private void AddZip(FileInfo fileInfo)
-        //{
-        //    this.tableLayoutPanel1.Visible = true;
-
-        //    BackgroundWorker backgroundWorker = new BackgroundWorker();
-        //    backgroundWorker.WorkerReportsProgress = true;
-        //    backgroundWorker.DoWork += (s, e) =>
-        //    {
-        //        using (ZipFile zip = ZipFile.Read(fileInfo.FullName))
-        //        {
-        //            DirectoryInfo directoryInfo = new DirectoryInfo(Form1.tempDirPath);
-
-        //            if (!directoryInfo.Exists)
-        //                directoryInfo.Create();
-
-        //            string fileExtension;
-        //            FileInfo extractedFileInfo;
-
-        //            int i = 0;
-        //            int total = zip.Count;
-
-        //            foreach (ZipEntry ze in zip)
-        //            {
-        //                fileExtension = ze.FileName.Substring(ze.FileName.Length - 4);
-
-        //                if (fileExtension == ".dcm" || fileExtension == ".DCM")
-        //                {
-        //                    ze.Extract(Form1.tempDirPath, ExtractExistingFileAction.OverwriteSilently);
-
-        //                    extractedFileInfo = new FileInfo(Form1.tempDirPath + ze.FileName.Replace('/', '\\'));
-        //                    // run in GUI thread
-        //                    this.treeView1.Invoke(
-        //                        new EventHandler(
-        //                            (s2, e2) =>
-        //                            {
-        //                                this.AddDCM(extractedFileInfo);
-        //                            }
-        //                        )
-        //                    );
-        //                }
-
-        //                i++;
-
-        //                backgroundWorker.ReportProgress((int)(i / (double)total * 100));
-
-        //                // DEBUG
-        //                System.Diagnostics.Debug.WriteLine("file: {0} | un.size: {1} | cp.size: {2} | cp.ratio: {3} | encrypt: {4}",
-        //                    ze.FileName,
-        //                    ze.UncompressedSize,
-        //                    ze.CompressedSize,
-        //                    ze.CompressionRatio,
-        //                    (ze.UsesEncryption) ? "Y" : "N");
-        //            }
-        //        }
-        //    };
-        //    backgroundWorker.RunWorkerCompleted += (s, e) =>
-        //    {
-        //        this.tableLayoutPanel1.Visible = false;
-        //        this.progressBar1.Value = 0;
-        //    };
-        //    backgroundWorker.ProgressChanged += (s, e) =>
-        //    {
-        //        this.progressBar1.Value = e.ProgressPercentage;
-        //    };
-        //    backgroundWorker.RunWorkerAsync();
-        //}
 
         private void openDICOMsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -253,6 +268,7 @@ namespace DICOMReader
 
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
+                this.label2.Text = "Extracting ZIP file...";
                 this.tableLayoutPanel1.Visible = true;
                 FileInfo fileInfo = new FileInfo(fileDialog.FileName);
 
@@ -324,6 +340,11 @@ namespace DICOMReader
         {
             if (e.KeyCode == Keys.Delete)
                 this.removeSelectedToolStripMenuItem_Click(sender, e);
+        }
+
+        private void buildHierarchyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.BuildTree();
         }
     }
 }

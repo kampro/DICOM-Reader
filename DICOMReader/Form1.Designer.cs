@@ -38,7 +38,7 @@
             this.showRawDICOMDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToBMPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nodesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildHierarchyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -139,17 +139,18 @@
             // nodesToolStripMenuItem
             // 
             this.nodesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.buildToolStripMenuItem,
+            this.buildHierarchyToolStripMenuItem,
             this.removeSelectedToolStripMenuItem});
             this.nodesToolStripMenuItem.Name = "nodesToolStripMenuItem";
             this.nodesToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
             this.nodesToolStripMenuItem.Text = "Nodes";
             // 
-            // buildToolStripMenuItem
+            // buildHierarchyToolStripMenuItem
             // 
-            this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
-            this.buildToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.buildToolStripMenuItem.Text = "Build hierarchy";
+            this.buildHierarchyToolStripMenuItem.Name = "buildHierarchyToolStripMenuItem";
+            this.buildHierarchyToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.buildHierarchyToolStripMenuItem.Text = "Build hierarchy";
+            this.buildHierarchyToolStripMenuItem.Click += new System.EventHandler(this.buildHierarchyToolStripMenuItem_Click);
             // 
             // removeSelectedToolStripMenuItem
             // 
@@ -334,7 +335,7 @@
         private System.Windows.Forms.ToolStripMenuItem openDirectoryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openZIPArchiveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem nodesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem buildHierarchyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeSelectedToolStripMenuItem;
 
     }

@@ -2,6 +2,7 @@
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Collections.Generic;
 
 namespace DICOMReader
 {
@@ -59,6 +60,20 @@ namespace DICOMReader
                 return false;
         }
 
+        public string[] GetIDs()
+        {
+            this.gdcmReader = new gdcm.ImageReader();
+            this.gdcmReader.SetFileName(this.filePath);
+
+            if (this.gdcmReader.Read())
+            {
+                this.file = this.gdcmReader.GetFile();
+                return new string[] { this.ReadTag(0x20, 0xD), this.ReadTag(0x20, 0xE) };
+            }
+            else
+                return new string[] { };
+        }
+
         public string ListAllTags()
         {
             if (this.image != null)
@@ -66,7 +81,6 @@ namespace DICOMReader
                 StringBuilder stringBuilder = new StringBuilder();
 
                 stringBuilder.AppendLine(this.file.GetHeader().toString());
-                //stringBuilder.AppendLine(this.file.GetDataSet().toString());
 
                 gdcm.CSharpDataSet csDataSet = new gdcm.CSharpDataSet(this.file.GetDataSet());
                 gdcm.DataElement dataElement;
@@ -90,15 +104,12 @@ namespace DICOMReader
                         stringBuilder.AppendLine(uvl.ToString());
                     }
                     else
-                    {
-                        //stringBuilder.Append(tag.toString());
-                        //stringBuilder.Append(" : ");
-                        stringBuilder.AppendLine(dataElement/*.GetValue()*/.toString());
-                    }
+                        stringBuilder.AppendLine(dataElement.toString());
 
                     csDataSet.Next();
                 }
 
+                stringBuilder.Replace("\r\n", "\n");
                 stringBuilder.Replace("\n", "\r\n");
 
                 return stringBuilder.ToString();
@@ -195,6 +206,7 @@ namespace DICOMReader
 
                 this.fileInformation.StudyID = this.ReadTag(0x20, 0x10);
                 this.fileInformation.StudyInstanceUID = this.ReadTag(0x20, 0xD);
+                this.fileInformation.SeriesInstanceUID = this.ReadTag(0x20, 0xE);
                 this.fileInformation.PatientID = this.ReadTag(0x10, 0x20);
                 this.fileInformation.PatientName = this.ReadTag(0x10, 0x10);
                 this.fileInformation.PatientBirthDate = this.ReadTag(0x10, 0x30);

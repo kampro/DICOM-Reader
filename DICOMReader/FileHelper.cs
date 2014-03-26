@@ -14,7 +14,7 @@ namespace DICOMReader
     {
         public const string tempDirPath = @".\TEMP\";
 
-        public RunWorkerCompletedEventHandler zipComplete;
+        public RunWorkerCompletedEventHandler zipCompleted;
         public ProgressChangedEventHandler zipProgressChanged;
 
         private TreeView treeView;
@@ -108,7 +108,7 @@ namespace DICOMReader
                     }
                 }
             };
-            this.backgroundWorker.RunWorkerCompleted += this.zipComplete;
+            this.backgroundWorker.RunWorkerCompleted += this.zipCompleted;
             this.backgroundWorker.ProgressChanged += this.zipProgressChanged;
             this.backgroundWorker.RunWorkerAsync();
         }
