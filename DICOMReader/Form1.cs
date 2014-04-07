@@ -96,20 +96,19 @@ namespace DICOMReader
                 List<FileInfo> entries = new List<FileInfo>();
                 TreeNode treeNode;
 
+                // Get entries from TreeView
                 foreach (TreeNode n in this.treeView1.Nodes)
-                    entries.Add(new FileInfo(n.Tag.ToString()));
+                {
+                    if (n.Tag != null)
+                        entries.Add(new FileInfo(n.Tag.ToString()));
+                }
 
                 double total = entries.Count;
 
-                this.treeView1.Invoke(
-                    new EventHandler(
-                        (s2, e2) =>
-                        {
-                            this.treeView1.Nodes.Clear();
-                        }
-                    )
-                );
+                // Clear tree
+                this.treeView1.Invoke((MethodInvoker)(() => this.treeView1.Nodes.Clear()));
 
+                // Build new tree
                 int i = 0;
 
                 foreach (FileInfo fi in entries)
@@ -120,41 +119,20 @@ namespace DICOMReader
                     {
                         ids = this.reader.GetIDs();
 
+                        // 1st level
                         if (!this.treeView1.Nodes.ContainsKey(ids[0]))
-                        {
-                            this.treeView1.Invoke(
-                                new EventHandler(
-                                    (s2, e2) =>
-                                    {
-                                        this.treeView1.Nodes.Add(ids[0], ids[0]);
-                                    }
-                                )
-                            );
-                        }
+                            this.treeView1.Invoke((MethodInvoker)(() => this.treeView1.Nodes.Add(ids[0], ids[0])));
 
+                        // 2nd level
                         if (!this.treeView1.Nodes[ids[0]].Nodes.ContainsKey(ids[1]))
-                        {
-                            this.treeView1.Invoke(
-                                new EventHandler(
-                                    (s2, e2) =>
-                                    {
-                                        this.treeView1.Nodes[ids[0]].Nodes.Add(ids[1], ids[1]);
-                                    }
-                                )
-                            );
-                        }
+                            this.treeView1.Invoke((MethodInvoker)(() => this.treeView1.Nodes[ids[0]].Nodes.Add(ids[1], ids[1])));
 
+                        // 3rd level
                         treeNode = new TreeNode(fi.Name);
                         treeNode.Tag = fi.FullName;
 
-                        this.treeView1.Invoke(
-                            new EventHandler(
-                                (s2, e2) =>
-                                {
-                                    this.treeView1.Nodes[ids[0]].Nodes[ids[1]].Nodes.Add(treeNode);
-                                }
-                            )
-                        );
+                        if (!this.treeView1.Nodes[ids[0]].Nodes[ids[1]].Nodes.ContainsKey(fi.Name))
+                            this.treeView1.Invoke((MethodInvoker)(() => this.treeView1.Nodes[ids[0]].Nodes[ids[1]].Nodes.Add(treeNode)));
 
                         i++;
 
@@ -230,8 +208,8 @@ namespace DICOMReader
 
             if (this.fileHelper.IsDCM(fileInfo))
                 this.fileHelper.AddDCM(fileInfo);
-            else if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
-            { MessageBox.Show("DIR"); }
+            else if (this.fileHelper.IsDir(fileInfo))
+                this.fileHelper.AddDir(new DirectoryInfo(path));
             else if (this.fileHelper.IsZip(fileInfo))
             {
                 this.label2.Text = "Extracting ZIP file...";
@@ -257,6 +235,14 @@ namespace DICOMReader
                     this.fileHelper.AddDCM(fileInfo);
                 }
             }
+        }
+
+        private void openDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderDialog = new FolderBrowserDialog();
+
+            if (folderDialog.ShowDialog() == DialogResult.OK)
+                this.fileHelper.AddDir(new DirectoryInfo(folderDialog.SelectedPath));
         }
 
         private void openZIPArchiveToolStripMenuItem_Click(object sender, EventArgs e)

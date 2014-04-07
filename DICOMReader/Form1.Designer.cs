@@ -114,6 +114,7 @@
             this.openDirectoryToolStripMenuItem.Name = "openDirectoryToolStripMenuItem";
             this.openDirectoryToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.openDirectoryToolStripMenuItem.Text = "Open directory";
+            this.openDirectoryToolStripMenuItem.Click += new System.EventHandler(this.openDirectoryToolStripMenuItem_Click);
             // 
             // openZIPArchiveToolStripMenuItem
             // 

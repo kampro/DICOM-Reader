@@ -36,6 +36,14 @@ namespace DICOMReader
                 return false;
         }
 
+        public bool IsDir(FileInfo fileInfo)
+        {
+            if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                return true;
+            else
+                return false;
+        }
+
         public bool IsZip(FileInfo fileInfo)
         {
             if (((fileInfo.Attributes & FileAttributes.Archive) == FileAttributes.Archive) &&
@@ -53,8 +61,20 @@ namespace DICOMReader
             this.treeView.Nodes.Add(node);
         }
 
-        public void AddDir(FileInfo fileInfo)
+        public void AddDir(DirectoryInfo dirInfo)
         {
+            FileInfo[] files = dirInfo.GetFiles();
+            TreeNode node;
+
+            foreach (FileInfo f in files)
+            {
+                if (this.IsDCM(f))
+                {
+                    node = new TreeNode(f.Name);
+                    node.Tag = f.FullName;
+                    this.treeView.Nodes.Add(node);
+                }
+            }
         }
 
         public void AddZip(FileInfo fileInfo)
@@ -84,14 +104,7 @@ namespace DICOMReader
 
                             extractedFileInfo = new FileInfo(FileHelper.tempDirPath + ze.FileName.Replace('/', '\\'));
                             // run in GUI thread
-                            this.treeView.Invoke(
-                                new EventHandler(
-                                    (s2, e2) =>
-                                    {
-                                        this.AddDCM(extractedFileInfo);
-                                    }
-                                )
-                            );
+                            this.treeView.Invoke((MethodInvoker)(() => this.AddDCM(extractedFileInfo)));
                         }
 
                         i++;
