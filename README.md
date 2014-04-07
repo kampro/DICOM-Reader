@@ -3,7 +3,7 @@
 
 Application for viewing DICOM files (supports ZIP archives).
 
-**License:** GNU GPL v3.0
+**License:** GNU GPL v3.0 (http://www.gnu.org/licenses/)
 
 Requirements
 ---
